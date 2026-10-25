@@ -77,7 +77,7 @@ function draw(piece) {
     </defs>
     <path class="hit" d="${d}" fill="url(#gf${id})"/>
     <g clip-path="url(#gc${id})" class="shine">
-      <path d="${gloss}" fill="url(#gg${id})"/>
+      <path class="gloss" d="${gloss}" fill="url(#gg${id})"/>
       <rect class="edge" x="0" y="${h - 5}" width="${w}" height="5"/>
     </g>
     <path class="rim" d="${d}" fill="none"/>`;
