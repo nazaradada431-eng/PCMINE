@@ -18,7 +18,7 @@ export function renderTabs(active) {
     const on = t.id === active;
     b.className =
       'px-5 py-2.5 font-bold text-sm flex items-center gap-2 transition shrink-0 rounded-xl ' +
-      (on ? 'btn-main' : 'bg-[#1e2026] text-slate-300 hover:text-white');
+      (on ? 'btn-main' : 'bg-[#13141a] text-slate-300 hover:text-white');
     b.innerHTML = `<i data-lucide="${t.icon}" class="w-4 h-4"></i>${t.label}`;
   });
 
@@ -100,7 +100,7 @@ export function renderShop() {
         </div>
         <div class="mt-4 pt-3 border-t border-white/10 flex flex-col gap-2">
           <div class="mono text-xs font-extrabold text-amber-400">${fmt(item.price)} 🪙</div>
-          <button data-action="buy" data-id="${item.id}" ${can ? '' : 'disabled'} class="w-full py-2 font-bold text-xs ${can ? 'btn-main' : 'bg-[#2a2c34] text-slate-600 cursor-not-allowed'} transition">Купить</button>
+          <button data-action="buy" data-id="${item.id}" ${can ? '' : 'disabled'} class="w-full py-2 font-bold text-xs ${can ? 'btn-main' : 'bg-[#1c1e26] text-slate-600 cursor-not-allowed'} transition">Купить</button>
         </div>
       </div>`;
   }).join('');
@@ -156,7 +156,7 @@ export function renderHistory() {
   feed.innerHTML = game.upgradeHistory
     .map(
       (h) => `
-      <div class="p-2.5 rounded-xl bg-[#1e2026] border-l-4 ${h.isWin ? 'border-emerald-500' : 'border-red-500'} text-xs flex flex-col gap-0.5 shrink-0 w-[190px] lg:w-full">
+      <div class="p-2.5 rounded-xl bg-[#13141a] border-l-4 ${h.isWin ? 'border-emerald-500' : 'border-red-500'} text-xs flex flex-col gap-0.5 shrink-0 w-[190px] lg:w-full">
         <div class="flex items-center justify-between gap-2">
           <span class="font-bold text-white truncate">${h.itemName}</span>
           <span class="text-[10px] font-extrabold ${h.isWin ? 'text-emerald-400' : 'text-red-400'}">${h.isWin ? 'УСПЕХ' : 'ПРОВАЛ'}</span>
@@ -173,7 +173,7 @@ export function renderRig() {
     const eq = game.rigSlots[s.cat];
     if (eq) {
       return `
-        <div class="bg-[#1e2026] rounded-xl p-3 flex flex-col items-center justify-between min-h-[180px]">
+        <div class="bg-[#13141a] rounded-xl p-3 flex flex-col items-center justify-between min-h-[180px]">
           <span class="label">${s.label}</span>
           <div class="my-2 text-center flex flex-col items-center">
             <i data-lucide="${eq.icon}" class="w-8 h-8 text-amber-400 mb-1"></i>
@@ -185,13 +185,13 @@ export function renderRig() {
         </div>`;
     }
     return `
-      <div class="bg-[#1e2026] rounded-xl p-3 flex flex-col items-center justify-between min-h-[180px]">
+      <div class="bg-[#13141a] rounded-xl p-3 flex flex-col items-center justify-between min-h-[180px]">
         <span class="label">${s.label}</span>
         <div class="my-2 text-center flex flex-col items-center">
           <i data-lucide="${s.icon}" class="w-8 h-8 text-slate-600 mb-1"></i>
           <span class="text-xs text-slate-500">Пусто</span>
         </div>
-        <button data-action="equip-open" data-cat="${s.cat}" class="w-full py-1.5 bg-[#2a2c34] hover:bg-[#33353e] text-slate-200 text-xs font-semibold transition">Вставить</button>
+        <button data-action="equip-open" data-cat="${s.cat}" class="w-full py-1.5 bg-[#1c1e26] hover:bg-[#262831] text-slate-200 text-xs font-semibold transition">Вставить</button>
       </div>`;
   }).join('');
   icons();

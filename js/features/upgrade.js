@@ -2,6 +2,7 @@ import { confetti } from '../ui/effects.js';
 import { $ } from '../ui/dom.js';
 import { icons } from '../ui/icons.js';
 import { drawWheel, spinArrow } from '../ui/wheel.js';
+import { mountGlass } from '../ui/glass.js';
 import {
   renderInventory,
   renderTargets,
@@ -16,12 +17,24 @@ import { game, ui, uid, hooks, saveGame } from '../core/state.js';
 import { playSound } from '../core/audio.js';
 
 const MAX_CHANCE = 95;
-const QUICK_MULTIPLIERS = [2, 3, 8];
-const QUICK_PERCENTS = [25, 50, 75];
+const QUICK_MULTIPLIERS = [
+  { value: 2, color: 'green' },
+  { value: 3, color: 'yellow' },
+  { value: 8, color: 'red' }
+];
+const QUICK_PERCENTS = [
+  { value: 25, color: 'red' },
+  { value: 50, color: 'yellow' },
+  { value: 75, color: 'green' }
+];
+const SHAPES = ['left', 'mid', 'right'];
 
-const BTN_BASE = 'w-full max-w-[340px] py-4 font-extrabold text-lg flex items-center justify-center gap-2 transition ';
-const BTN_ON = BTN_BASE + 'btn-main cursor-pointer';
-const BTN_OFF = BTN_BASE + 'bg-[#2a2c34] text-slate-500 cursor-not-allowed';
+function setUpgradeReady(ready) {
+  const btn = $('btn-upgrade-action');
+  btn.disabled = !ready;
+  btn.classList.toggle('g-gold', ready);
+  btn.classList.toggle('g-off', !ready);
+}
 
 export function selectedItems() {
   return ui.inputIds.map((id) => game.inventory.find((i) => i.instanceId === id)).filter(Boolean);
@@ -122,21 +135,23 @@ export function updateCalc() {
   $('free-spins').innerText = spins;
   $('free-spins-badge').classList.toggle('hidden', spins <= 0);
 
-  const btn = $('btn-upgrade-action');
-  const ready = c.chance > 0 && !!ui.target;
-  btn.disabled = !ready;
-  btn.className = ready ? BTN_ON : BTN_OFF;
+  setUpgradeReady(c.chance > 0 && !!ui.target);
 
   if (c.chance !== ui.lastChance) drawWheel(c.chance);
 }
 
 export function initQuick() {
   $('quick-mult').innerHTML = QUICK_MULTIPLIERS.map(
-    (m) => `<button class="qbtn" data-action="quick" data-key="m${m}" data-ratio="${m}">x${m}</button>`
+    (m, i) =>
+      `<button class="gpiece qbtn g-${m.color}" data-shape="${SHAPES[i]}" data-action="quick" data-key="m${m.value}" data-ratio="${m.value}"><span>x${m.value}</span></button>`
   ).join('');
   $('quick-pct').innerHTML = QUICK_PERCENTS.map(
-    (p) => `<button class="qbtn" data-action="quick" data-key="p${p}" data-ratio="${100 / p}">${p}%</button>`
+    (p, i) =>
+      `<button class="gpiece qbtn g-${p.color}" data-shape="${SHAPES[i]}" data-action="quick" data-key="p${p.value}" data-ratio="${100 / p.value}"><span>${p.value}%</span></button>`
   ).join('');
+  mountGlass($('quick-mult'));
+  mountGlass($('quick-pct'));
+  mountGlass($('btn-upgrade-action'));
 }
 
 export function clearQuick() {
@@ -218,9 +233,7 @@ export function performUpgrade() {
   clearQuick();
 
   ui.spinning = true;
-  const btn = $('btn-upgrade-action');
-  btn.disabled = true;
-  btn.className = BTN_OFF;
+  setUpgradeReady(false);
   renderBalance();
   renderInventory();
   setStatus('Вращение…', 'text-amber-400');
@@ -275,14 +288,14 @@ function showResult(isWin, item, info) {
   const lost = info.lostItems.length ? info.lostItems.map((i) => i.name).join(', ') : 'монеты';
 
   if (isWin) {
-    card.className = 'bg-[#17181d] border-2 border-emerald-400 rounded-2xl max-w-sm w-full p-6 flex flex-col items-center text-center gap-4 shadow-2xl';
+    card.className = 'bg-[#0d0e12] border-2 border-emerald-400 rounded-2xl max-w-sm w-full p-6 flex flex-col items-center text-center gap-4 shadow-2xl';
     title.innerText = 'Успех!';
     title.className = 'text-2xl font-black text-emerald-400';
     $('result-desc').innerText = 'Вы получили предмет';
     iconBox.className = 'w-20 h-20 rounded-2xl bg-emerald-400/10 border border-emerald-400/30 flex items-center justify-center text-emerald-400';
     iconBox.innerHTML = '<i data-lucide="check-circle" class="w-10 h-10"></i>';
   } else {
-    card.className = 'bg-[#17181d] border-2 border-red-500 rounded-2xl max-w-sm w-full p-6 flex flex-col items-center text-center gap-4 shadow-2xl';
+    card.className = 'bg-[#0d0e12] border-2 border-red-500 rounded-2xl max-w-sm w-full p-6 flex flex-col items-center text-center gap-4 shadow-2xl';
     title.innerText = 'Неудача';
     title.className = 'text-2xl font-black text-red-500';
     $('result-desc').innerText = info.refunded

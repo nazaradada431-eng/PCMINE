@@ -36,12 +36,12 @@ function drawTicks(ctx) {
 function drawTrack(ctx) {
   ctx.beginPath();
   ctx.arc(CENTER, CENTER, RADIUS, 0, TAU);
-  ctx.strokeStyle = '#26282f';
+  ctx.strokeStyle = '#1a1c23';
   ctx.lineWidth = WIDTH;
   ctx.stroke();
   ctx.beginPath();
   ctx.arc(CENTER, CENTER, RADIUS + WIDTH / 2 + 1, 0, TAU);
-  ctx.strokeStyle = '#34363f';
+  ctx.strokeStyle = '#272a33';
   ctx.lineWidth = 1;
   ctx.stroke();
 }
