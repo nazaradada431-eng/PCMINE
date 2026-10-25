@@ -5,13 +5,16 @@ const OFFLINE_CAP_MS = 8 * 60 * 60 * 1000;
 
 export const hooks = { refresh: () => {} };
 
+const emptyRigSlots = () => ({ gpu: null, cpu: null, ram: null, cooler: null, psu: null, mobo: null });
+const createRig = () => ({ id: uid(), slots: emptyRigSlots() });
+
 export const game = {
   coins: 1000,
   clickPower: 10,
   inventory: [],
   upgradeHistory: [],
   upgradeCount: 0,
-  rigSlots: { gpu: null, cpu: null, ram: null, cooler: null, psu: null, mobo: null },
+  rigs: [],
   audioEnabled: true,
   usedPromos: [],
   freeSpins: 0,
@@ -39,7 +42,11 @@ export function makeItem(base) {
 }
 
 export function rigIncome() {
-  return Object.values(game.rigSlots).reduce((sum, it) => sum + (it ? it.income : 0), 0);
+  return game.rigs.reduce((sum, rig) => {
+    const parts = Object.values(rig.slots);
+    const income = parts.reduce((total, it) => total + (it ? it.income : 0), 0);
+    return sum + income * (parts.every(Boolean) ? 1.1 : 1);
+  }, 0);
 }
 
 export function saveGame() {
@@ -60,6 +67,7 @@ export function loadGame() {
   }
 
   if (!raw) {
+    game.rigs = [createRig()];
     game.inventory.push(makeItem('gpu_gt710'), makeItem('cpu_celeron'));
     return;
   }
@@ -83,7 +91,16 @@ export function loadGame() {
     return it;
   };
   game.inventory.forEach(normalize);
-  Object.values(game.rigSlots).forEach(normalize);
+  if (!Array.isArray(game.rigs)) {
+    const legacySlots = game.rigSlots || emptyRigSlots();
+    game.rigs = [Object.values(legacySlots).some(Boolean) ? { id: uid(), slots: legacySlots } : createRig()];
+    delete game.rigSlots;
+  }
+  if (!game.rigs.length) game.rigs.push(createRig());
+  game.rigs.forEach((rig) => {
+    if (!rig.slots) rig.slots = emptyRigSlots();
+    Object.values(rig.slots).forEach(normalize);
+  });
 
   const away = Math.min(Math.max(0, Date.now() - (game.lastSeen || Date.now())), OFFLINE_CAP_MS);
   game.coins += (away / 1000) * rigIncome();

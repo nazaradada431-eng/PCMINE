@@ -27,11 +27,13 @@ function normalize(code) {
 }
 
 function equipBest() {
+  if (!game.rigs.length) game.rigs.push({ id: uid(), slots: { gpu: null, cpu: null, ram: null, cooler: null, psu: null, mobo: null } });
+  const rig = game.rigs[0];
   SLOTS.forEach((slot) => {
     const best = ITEMS_DB.filter((i) => i.category === slot.cat).sort((a, b) => b.price - a.price)[0];
     if (!best) return;
-    if (game.rigSlots[slot.cat]) game.inventory.push(game.rigSlots[slot.cat]);
-    game.rigSlots[slot.cat] = { ...best, instanceId: uid() };
+    if (rig.slots[slot.cat]) game.inventory.push(rig.slots[slot.cat]);
+    rig.slots[slot.cat] = { ...best, instanceId: uid() };
   });
 }
 
@@ -43,9 +45,7 @@ function resetProgress() {
   game.upgradeCount = 0;
   game.freeSpins = 0;
   game.rigged = false;
-  Object.keys(game.rigSlots).forEach((slot) => {
-    game.rigSlots[slot] = null;
-  });
+  game.rigs = [{ id: uid(), slots: { gpu: null, cpu: null, ram: null, cooler: null, psu: null, mobo: null } }];
   ui.inputIds = [];
 }
 

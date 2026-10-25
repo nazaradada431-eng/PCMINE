@@ -166,46 +166,36 @@ export function renderHistory() {
 }
 
 export function renderRig() {
-  $('rig-slots').innerHTML = SLOTS.map((s) => {
-    const eq = game.rigSlots[s.cat];
-    if (eq) {
-      return `
-        <div class="bg-[#13141a] rounded-xl p-3 flex flex-col items-center justify-between min-h-[180px]">
-          <span class="label">${s.label}</span>
-          <div class="my-2 text-center flex flex-col items-center">
-            <i data-lucide="${eq.icon}" class="w-8 h-8 text-amber-400 mb-1"></i>
-            <span class="text-xs font-bold text-white truncate max-w-[110px]">${eq.name}</span>
-            <span class="text-[11px] text-amber-400 font-semibold mono">+${eq.income} 🪙/сек</span>
-            <span class="mono text-[9px] text-slate-500">${specText(eq)}</span>
-          </div>
-          <button data-action="unequip" data-cat="${s.cat}" class="w-full py-1.5 bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white border border-red-500/30 text-xs font-semibold transition">Снять</button>
-        </div>`;
-    }
-    return `
-      <div class="bg-[#13141a] rounded-xl p-3 flex flex-col items-center justify-between min-h-[180px]">
-        <span class="label">${s.label}</span>
-        <div class="my-2 text-center flex flex-col items-center">
-          <i data-lucide="${s.icon}" class="w-8 h-8 text-slate-600 mb-1"></i>
-          <span class="text-xs text-slate-500">Пусто</span>
-        </div>
-        <button data-action="equip-open" data-cat="${s.cat}" class="w-full py-1.5 bg-[#1c1e26] hover:bg-[#262831] text-slate-200 text-xs font-semibold transition">Вставить</button>
-      </div>`;
-  }).join('');
+  const rigs = game.rigs || [];
+  $('rig-slots').innerHTML = rigs.map((rig, index) => {
+    const parts = Object.values(rig.slots);
+    const complete = parts.every(Boolean);
+    const income = parts.reduce((sum, it) => sum + (it ? it.income : 0), 0);
+    return `<section class="col-span-full bg-[#0d0e12] border border-[#242630] rounded-xl p-3 sm:p-4">
+      <div class="flex justify-between items-center gap-3 mb-3"><div><div class="font-bold text-white">Компьютер ${index + 1}</div><div class="text-xs text-slate-400 mt-0.5">${complete ? '<span class="text-emerald-400">Собран · бонус +10%</span>' : 'Соберите все 6 компонентов для бонуса +10%'}</div></div><div class="text-right text-amber-400 font-bold mono text-sm">+${(income * (complete ? 1.1 : 1)).toFixed(1)}/с</div></div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">${SLOTS.map((slot) => {
+        const eq = rig.slots[slot.cat];
+        return `<div class="bg-[#13141a] rounded-xl p-2.5 flex flex-col items-center justify-between min-h-[145px]"><span class="label text-center">${slot.label}</span><div class="my-2 text-center flex flex-col items-center min-w-0 w-full">${eq ? `<i data-lucide="${eq.icon}" class="w-7 h-7 text-amber-400 mb-1"></i><span class="text-[11px] font-bold text-white truncate max-w-full">${eq.name}</span><span class="text-[10px] text-amber-400 font-semibold mono">+${eq.income}/с</span>` : `<i data-lucide="${slot.icon}" class="w-7 h-7 text-slate-600 mb-1"></i><span class="text-xs text-slate-500">Пусто</span>`}</div>${eq ? `<button data-action="unequip" data-rig="${rig.id}" data-cat="${slot.cat}" class="w-full py-1.5 bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white border border-red-500/30 text-xs font-semibold transition">Снять</button>` : `<button data-action="equip-open" data-rig="${rig.id}" data-cat="${slot.cat}" class="w-full py-1.5 bg-[#1c1e26] hover:bg-[#262831] text-slate-200 text-xs font-semibold transition">Выбрать деталь</button>`}</div>`;
+      }).join('')}</div></section>`;
+  }).join('') + `<button data-action="rig-add" class="col-span-full py-3 bg-[#13141a] hover:bg-[#1c1e26] border border-dashed border-[#3a3d48] rounded-xl text-slate-200 font-bold text-sm transition">＋ Добавить компьютер</button>`;
   icons();
 }
-
 export function renderRigStats() {
   let income = 0;
   let hash = 0;
   let draw = 0;
   let cap = 0;
-  Object.values(game.rigSlots).forEach((it) => {
-    if (!it) return;
-    income += it.income;
-    hash += it.income * 1.7;
-    const s = specs(it);
-    if (s.isPsu) cap = s.watt;
-    else draw += s.watt;
+  (game.rigs || []).forEach((rig) => {
+    const parts = Object.values(rig.slots);
+    const multiplier = parts.every(Boolean) ? 1.1 : 1;
+    parts.forEach((it) => {
+      if (!it) return;
+      income += it.income * multiplier;
+      hash += it.income * 1.7 * multiplier;
+      const s = specs(it);
+      if (s.isPsu) cap += s.watt;
+      else draw += s.watt;
+    });
   });
 
   $('stat-income-rate').innerText = income.toFixed(1);
@@ -219,17 +209,15 @@ export function renderRigStats() {
   const bar = $('rig-load-bar');
   bar.style.width = pct + '%';
   bar.className = 'h-full transition-all ' + (pct > 90 ? 'bg-red-500' : pct > 70 ? 'bg-amber-400' : 'bg-emerald-400');
-  $('rig-load-text').innerText =
-    cap > 0 ? `${draw} W / ${cap} W · ${pct.toFixed(0)}%` : draw > 0 ? `${draw} W / нет БП` : '— / —';
+  $('rig-load-text').innerText = cap > 0 ? `${draw} W / ${cap} W · ${pct.toFixed(0)}%` : draw > 0 ? `${draw} W / нет БП` : '— / —';
 }
-
-export function renderEquipList(category) {
+export function renderEquipList(category, rigId) {
   const items = game.inventory.filter((i) => i.category === category);
   $('equip-modal-list').innerHTML = items.length
     ? items
         .map(
           (item) => `
-          <div data-action="equip" data-cat="${category}" data-id="${item.instanceId}" class="rarity-${item.rarity} border p-2.5 cursor-pointer hover:border-amber-400 flex flex-col justify-between">
+          <div data-action="equip" data-rig="${rigId}" data-cat="${category}" data-id="${item.instanceId}" class="rarity-${item.rarity} border p-2.5 cursor-pointer hover:border-amber-400 flex flex-col justify-between">
             <div class="text-xs font-bold text-white truncate">${item.name}</div>
             <div class="text-[11px] text-amber-400 font-semibold mt-1 mono">+${item.income} 🪙/сек</div>
             ${specLine(item)}

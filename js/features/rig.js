@@ -1,11 +1,18 @@
-import { game, ui, hooks, saveGame, rigIncome } from '../core/state.js';
+import { game, ui, hooks, saveGame, rigIncome, uid } from '../core/state.js';
 import { playSound } from '../core/audio.js';
 import { $ } from '../ui/dom.js';
 import { renderEquipList, renderBalance } from '../ui/render.js';
 import { updateCalc } from './upgrade.js';
 
-export function openEquip(category) {
-  renderEquipList(category);
+export function addRig() {
+  game.rigs.push({ id: uid(), slots: { gpu: null, cpu: null, ram: null, cooler: null, psu: null, mobo: null } });
+  hooks.refresh();
+  saveGame();
+  playSound('click');
+}
+
+export function openEquip(rigId, category) {
+  renderEquipList(category, rigId);
   $('equip-modal').classList.remove('hidden');
 }
 
@@ -13,13 +20,15 @@ export function closeEquip() {
   $('equip-modal').classList.add('hidden');
 }
 
-export function equip(category, instanceId) {
+export function equip(rigId, category, instanceId) {
+  const rig = game.rigs.find((entry) => entry.id === rigId);
+  if (!rig) return;
   const idx = game.inventory.findIndex((i) => i.instanceId === instanceId);
   if (idx === -1) return;
   const item = game.inventory[idx];
   game.inventory.splice(idx, 1);
-  if (game.rigSlots[category]) game.inventory.push(game.rigSlots[category]);
-  game.rigSlots[category] = item;
+  if (rig.slots[category]) game.inventory.push(rig.slots[category]);
+  rig.slots[category] = item;
   ui.inputIds = ui.inputIds.filter((id) => id !== instanceId);
   closeEquip();
   hooks.refresh();
@@ -27,10 +36,11 @@ export function equip(category, instanceId) {
   playSound('click');
 }
 
-export function unequip(category) {
-  if (!game.rigSlots[category]) return;
-  game.inventory.push(game.rigSlots[category]);
-  game.rigSlots[category] = null;
+export function unequip(rigId, category) {
+  const rig = game.rigs.find((entry) => entry.id === rigId);
+  if (!rig || !rig.slots[category]) return;
+  game.inventory.push(rig.slots[category]);
+  rig.slots[category] = null;
   hooks.refresh();
   saveGame();
   playSound('click');

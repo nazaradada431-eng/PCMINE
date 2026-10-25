@@ -31,7 +31,7 @@ import {
 } from './features/upgrade.js';
 import { initDrag } from './features/drag.js';
 import { buyItem, sellItem, sellCommon, tap } from './features/inventory.js';
-import { openEquip, closeEquip, equip, unequip, startIncomeTimer } from './features/rig.js';
+import { openEquip, closeEquip, equip, unequip, addRig, startIncomeTimer } from './features/rig.js';
 import { openPromo, closePromo, submitPromo } from './features/promo.js';
 
 function renderAll() {
@@ -70,10 +70,11 @@ const actions = {
   sell: (d) => sellItem(d.id),
   buy: (d) => buyItem(d.id),
   tap: (d, e) => tap(e),
-  'equip-open': (d) => openEquip(d.cat),
+  'equip-open': (d) => openEquip(d.rig, d.cat),
   'equip-close': closeEquip,
-  equip: (d) => equip(d.cat, d.id),
-  unequip: (d) => unequip(d.cat),
+  equip: (d) => equip(d.rig, d.cat, d.id),
+  unequip: (d) => unequip(d.rig, d.cat),
+  'rig-add': addRig,
   'result-close': closeResult
 };
 
