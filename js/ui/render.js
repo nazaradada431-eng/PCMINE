@@ -24,12 +24,9 @@ export function renderTabs(active) {
 
   const navButton = (t) =>
     `<button data-action="tab" data-tab="${t.id}" class="${t.id === active ? 'on' : ''}"><i data-lucide="${t.icon}" class="w-5 h-5"></i>${t.short}</button>`;
-  $('bottom-nav').innerHTML =
-    navButton(TABS[0]) +
-    navButton(TABS[1]) +
-    `<button class="fab" data-action="promo-open" aria-label="Промокод"><i data-lucide="gift" class="w-6 h-6"></i></button>` +
-    navButton(TABS[2]) +
-    navButton(TABS[3]);
+  const promoButton = `<button data-action="promo-open"><i data-lucide="gift" class="w-5 h-5"></i>Промокод</button>`;
+  const upgradeFab = `<button class="fab ${active === 'upgrade' ? 'on' : ''}" data-action="tab" data-tab="upgrade" aria-label="Апгрейд"><i data-lucide="zap" class="w-6 h-6"></i></button>`;
+  $('bottom-nav').innerHTML = promoButton + navButton(TABS[1]) + upgradeFab + navButton(TABS[2]) + navButton(TABS[3]);
   icons();
 }
 
