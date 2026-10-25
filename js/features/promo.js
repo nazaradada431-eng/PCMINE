@@ -1,5 +1,6 @@
 import { confetti } from '../ui/effects.js';
 import { $ } from '../ui/dom.js';
+import { renderHistory } from '../ui/render.js';
 import { ITEMS_DB, SLOTS, findItem } from '../data/items.js';
 import { PROMOS, PROMO_SALT } from '../data/promos.js';
 import { game, ui, uid, hooks, saveGame, itemsByGroup } from '../core/state.js';
@@ -34,7 +35,22 @@ function equipBest() {
   });
 }
 
+function resetProgress() {
+  game.coins = 0;
+  game.clickPower = 10;
+  game.inventory = [];
+  game.upgradeHistory = [];
+  game.upgradeCount = 0;
+  game.freeSpins = 0;
+  game.rigged = false;
+  Object.keys(game.rigSlots).forEach((slot) => {
+    game.rigSlots[slot] = null;
+  });
+  ui.inputIds = [];
+}
+
 function applyGrant(grant) {
+  if (grant.reset) resetProgress();
   if (grant.coins) game.coins += grant.coins;
   if (grant.click) game.clickPower += grant.click;
   (grant.items || []).forEach(({ group, count }) => {
@@ -91,5 +107,6 @@ export async function submitPromo() {
   playSound('win');
   confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 } });
   hooks.refresh();
+  renderHistory();
   saveGame();
 }

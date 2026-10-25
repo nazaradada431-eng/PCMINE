@@ -15,7 +15,7 @@ import {
   setPanel
 } from './ui/render.js';
 import { findItem } from './data/items.js';
-import { game, ui, hooks, loadGame, saveGame, resetGame } from './core/state.js';
+import { game, ui, hooks, loadGame, saveGame } from './core/state.js';
 import { playSound } from './core/audio.js';
 import {
   refreshSlots,
@@ -56,11 +56,6 @@ const actions = {
     game.audioEnabled = !game.audioEnabled;
     renderAudioIcon();
     saveGame();
-  },
-  reset: () => {
-    if (!confirm('Вы уверены, что хотите сбросить весь прогресс?')) return;
-    resetGame();
-    location.reload();
   },
   'promo-open': openPromo,
   'promo-close': closePromo,

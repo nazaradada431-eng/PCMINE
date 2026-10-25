@@ -140,5 +140,10 @@ export const PROMOS = [
     title: 'Получено: Core i9-12900K',
     once: true,
     grant: { itemIds: ['cpu_i9_12900k'] }
+  },
+  {
+    hash: '85036f4d2efed57cfe36b945a6e6eb876be19cd66b33d6fb0be82c18c05b48bd',
+    title: 'Прогресс сброшен',
+    grant: { reset: true }
   }
 ];

@@ -89,13 +89,6 @@ export function loadGame() {
   game.coins += (away / 1000) * rigIncome();
 }
 
-export function resetGame() {
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch (e) {
-    return;
-  }
-}
 
 export function itemsByGroup(group) {
   if (group === 'top') return ITEMS_DB.filter((i) => i.rarity === 'legendary' || i.rarity === 'mythic');
