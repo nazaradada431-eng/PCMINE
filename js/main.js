@@ -9,6 +9,7 @@ import {
   renderTargets,
   renderShop,
   renderRig,
+  renderRigDetails,
   renderRigStats,
   renderHistory,
   renderAudioIcon,
@@ -31,7 +32,7 @@ import {
 } from './features/upgrade.js';
 import { initDrag } from './features/drag.js';
 import { buyItem, sellItem, sellCommon, tap } from './features/inventory.js';
-import { openEquip, closeEquip, equip, unequip, addRig, startIncomeTimer } from './features/rig.js';
+import { openEquip, closeEquip, equip, unequip, addRig, openRigDetails, closeRigDetails, startIncomeTimer } from './features/rig.js';
 import { openPromo, closePromo, submitPromo } from './features/promo.js';
 
 function renderAll() {
@@ -43,6 +44,7 @@ function renderAll() {
   refreshSlots();
   updateCalc();
   renderRigStats();
+  if (ui.activeRigId) renderRigDetails(ui.activeRigId);
 }
 
 hooks.refresh = renderAll;
@@ -75,6 +77,8 @@ const actions = {
   equip: (d) => equip(d.rig, d.cat, d.id),
   unequip: (d) => unequip(d.rig, d.cat),
   'rig-add': addRig,
+  'rig-detail-open': (d) => openRigDetails(d.rig),
+  'rig-detail-close': closeRigDetails,
   'result-close': closeResult
 };
 

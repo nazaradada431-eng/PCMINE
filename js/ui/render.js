@@ -165,19 +165,67 @@ export function renderHistory() {
     .join('');
 }
 
+export function rigTitle(rig, index) {
+  const gpu = rig.slots.gpu;
+  const cpu = rig.slots.cpu;
+  return gpu && cpu ? `${gpu.name} ${cpu.name}` : `Компьютер ${index + 1}`;
+}
+
 export function renderRig() {
   const rigs = game.rigs || [];
   $('rig-slots').innerHTML = rigs.map((rig, index) => {
     const parts = Object.values(rig.slots);
     const complete = parts.every(Boolean);
-    const income = parts.reduce((sum, it) => sum + (it ? it.income : 0), 0);
-    return `<section class="col-span-full bg-[#0d0e12] border border-[#242630] rounded-xl p-3 sm:p-4">
-      <div class="flex justify-between items-center gap-3 mb-3"><div><div class="font-bold text-white">Компьютер ${index + 1}</div><div class="text-xs text-slate-400 mt-0.5">${complete ? '<span class="text-emerald-400">Собран · бонус +10%</span>' : 'Соберите все 6 компонентов для бонуса +10%'}</div></div><div class="text-right text-amber-400 font-bold mono text-sm">+${(income * (complete ? 1.1 : 1)).toFixed(1)}/с</div></div>
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">${SLOTS.map((slot) => {
-        const eq = rig.slots[slot.cat];
-        return `<div class="bg-[#13141a] rounded-xl p-2.5 flex flex-col items-center justify-between min-h-[145px]"><span class="label text-center">${slot.label}</span><div class="my-2 text-center flex flex-col items-center min-w-0 w-full">${eq ? `<i data-lucide="${eq.icon}" class="w-7 h-7 text-amber-400 mb-1"></i><span class="text-[11px] font-bold text-white truncate max-w-full">${eq.name}</span><span class="text-[10px] text-amber-400 font-semibold mono">+${eq.income}/с</span>` : `<i data-lucide="${slot.icon}" class="w-7 h-7 text-slate-600 mb-1"></i><span class="text-xs text-slate-500">Пусто</span>`}</div>${eq ? `<button data-action="unequip" data-rig="${rig.id}" data-cat="${slot.cat}" class="w-full py-1.5 bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white border border-red-500/30 text-xs font-semibold transition">Снять</button>` : `<button data-action="equip-open" data-rig="${rig.id}" data-cat="${slot.cat}" class="w-full py-1.5 bg-[#1c1e26] hover:bg-[#262831] text-slate-200 text-xs font-semibold transition">Выбрать деталь</button>`}</div>`;
-      }).join('')}</div></section>`;
-  }).join('') + `<button data-action="rig-add" class="col-span-full py-3 bg-[#13141a] hover:bg-[#1c1e26] border border-dashed border-[#3a3d48] rounded-xl text-slate-200 font-bold text-sm transition">＋ Добавить компьютер</button>`;
+    const income = parts.reduce((sum, it) => sum + (it ? it.income : 0), 0) * (complete ? 1.1 : 1);
+    const installed = parts.filter(Boolean).length;
+    return `<button data-action="rig-detail-open" data-rig="${rig.id}" class="rig-card w-full min-w-0 bg-[#13141a] hover:bg-[#1a1c23] border border-[#2a2c35] hover:border-amber-400/60 rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-between text-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400">
+      <span class="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-wide">МАЙНИНГ ФЕРМА</span>
+      <i data-lucide="server" class="w-9 h-9 sm:w-11 sm:h-11 ${complete ? 'text-amber-400' : 'text-slate-500'}"></i>
+      <span class="rig-card-title w-full text-xs sm:text-sm font-bold text-white leading-snug">${rigTitle(rig, index)}</span>
+      <span class="text-[10px] sm:text-xs text-slate-400">${installed}/6 компонентов</span>
+      <span class="text-xs font-bold text-amber-400 mono">+${income.toFixed(1)}/с ${complete ? '· +10%' : ''}</span>
+    </button>`;
+  }).join('') + `<button data-action="rig-add" class="rig-card w-full bg-[#13141a] hover:bg-[#1a1c23] border border-dashed border-[#3a3d48] hover:border-amber-400/60 rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-center gap-2 text-slate-300 hover:text-white transition"><i data-lucide="plus" class="w-8 h-8 text-amber-400"></i><span class="text-sm font-bold">Добавить ПК</span></button>`;
+  icons();
+}
+
+export function renderRigDetails(rigId) {
+  const rig = game.rigs.find((entry) => entry.id === rigId);
+  if (!rig) return;
+  const index = game.rigs.indexOf(rig);
+  const parts = Object.values(rig.slots);
+  const complete = parts.every(Boolean);
+  const income = parts.reduce((sum, it) => sum + (it ? it.income : 0), 0) * (complete ? 1.1 : 1);
+  let draw = 0;
+  let cap = 0;
+  let hash = 0;
+  parts.forEach((it) => {
+    if (!it) return;
+    hash += it.income * 1.7;
+    const spec = specs(it);
+    if (spec.isPsu) cap += spec.watt;
+    else draw += spec.watt;
+  });
+  const load = cap > 0 ? `${draw} / ${cap} W` : draw > 0 ? `${draw} W · нет БП` : '—';
+  $('rig-detail-content').innerHTML = `
+    <div class="flex items-start justify-between gap-3 mb-4">
+      <div class="min-w-0"><div class="text-[11px] text-slate-500 font-bold uppercase tracking-wide mb-1">СОСТАВ И ХАРАКТЕРИСТИКИ</div><h3 class="text-lg sm:text-2xl font-black text-white leading-tight break-words">${rigTitle(rig, index)}</h3><p class="text-xs sm:text-sm mt-1 ${complete ? 'text-emerald-400' : 'text-slate-400'}">${complete ? 'Полностью собран · бонус к доходу +10%' : `Установлено ${parts.filter(Boolean).length} из 6 деталей · соберите ПК для бонуса +10%`}</p></div>
+      <button data-action="rig-detail-close" class="shrink-0 text-slate-400 hover:text-white p-1" aria-label="Закрыть"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+      <div class="tm-cell"><div class="label">Доход</div><div class="v text-amber-400">+${income.toFixed(1)}/с</div></div>
+      <div class="tm-cell"><div class="label">Хешрейт</div><div class="v">${hash.toFixed(1)} MH/s</div></div>
+      <div class="tm-cell"><div class="label">Потребление</div><div class="v">${draw} W</div></div>
+      <div class="tm-cell"><div class="label">Блок питания</div><div class="v">${load}</div></div>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">${SLOTS.map((slot) => {
+      const eq = rig.slots[slot.cat];
+      return `<div class="bg-[#13141a] border border-[#242630] rounded-xl p-2.5 min-h-[145px] flex flex-col items-center justify-between text-center">
+        <span class="label">${slot.label}</span>
+        <div class="my-2 min-w-0 w-full flex flex-col items-center">${eq ? `<i data-lucide="${eq.icon}" class="w-7 h-7 text-amber-400 mb-1"></i><span class="text-[11px] font-bold text-white leading-tight">${eq.name}</span><span class="text-[10px] text-amber-400 mono mt-1">+${eq.income}/с</span><span class="text-[9px] text-slate-500 mt-1">${specText(eq)}</span>` : `<i data-lucide="${slot.icon}" class="w-7 h-7 text-slate-600 mb-1"></i><span class="text-xs text-slate-500">Не установлено</span>`}</div>
+        <div class="w-full flex gap-1">${eq ? `<button data-action="unequip" data-rig="${rig.id}" data-cat="${slot.cat}" class="flex-1 py-1.5 bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white border border-red-500/30 rounded-lg text-[10px] font-semibold transition">Снять</button>` : ''}<button data-action="equip-open" data-rig="${rig.id}" data-cat="${slot.cat}" class="flex-1 py-1.5 bg-[#1c1e26] hover:bg-[#262831] text-slate-200 rounded-lg text-[10px] font-semibold transition">${eq ? 'Заменить' : 'Установить'}</button></div>
+      </div>`;
+    }).join('')}</div>`;
   icons();
 }
 export function renderRigStats() {

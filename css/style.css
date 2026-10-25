@@ -107,6 +107,9 @@
 .gbtn.g-gold > span { text-shadow:0 1px 0 rgba(255,255,255,.35); }
 .gbtn.g-gold .edge { fill:#fff; opacity:.12; }
 
+.rig-card { aspect-ratio:1 / 1; }
+.rig-card-title { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; overflow-wrap:anywhere; }
+
 .qbtn .gloss { display:none; }
 .qbtn .s0, .qbtn .s1, .qbtn .s2 { stop-color:#16171d; stop-opacity:1; }
 .qbtn .edge { opacity:1; }

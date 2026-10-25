@@ -28,7 +28,8 @@ export const ui = {
   spinning: false,
   wheelAngle: 0,
   lastChance: -1,
-  quick: null
+  quick: null,
+  activeRigId: null
 };
 
 let uidCounter = 0;

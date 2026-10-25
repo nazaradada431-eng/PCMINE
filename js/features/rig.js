@@ -1,7 +1,7 @@
 import { game, ui, hooks, saveGame, rigIncome, uid } from '../core/state.js';
 import { playSound } from '../core/audio.js';
 import { $ } from '../ui/dom.js';
-import { renderEquipList, renderBalance } from '../ui/render.js';
+import { renderEquipList, renderRigDetails, renderBalance } from '../ui/render.js';
 import { updateCalc } from './upgrade.js';
 
 export function addRig() {
@@ -9,6 +9,17 @@ export function addRig() {
   hooks.refresh();
   saveGame();
   playSound('click');
+}
+
+export function openRigDetails(rigId) {
+  ui.activeRigId = rigId;
+  renderRigDetails(rigId);
+  $('rig-detail-modal').classList.remove('hidden');
+}
+
+export function closeRigDetails() {
+  ui.activeRigId = null;
+  $('rig-detail-modal').classList.add('hidden');
 }
 
 export function openEquip(rigId, category) {
