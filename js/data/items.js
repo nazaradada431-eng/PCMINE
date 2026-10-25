@@ -28,7 +28,7 @@ export const ITEMS_DB = [
   { id: 'gpu_rtx4090', name: 'NVIDIA RTX 4090 24GB', category: 'gpu', price: 60000, income: 850, rarity: 'legendary', icon: 'monitor' },
   { id: 'cpu_i9_14900ks', name: 'Core i9-14900KS Spec', category: 'cpu', price: 65000, income: 920, rarity: 'legendary', icon: 'cpu' },
   { id: 'ram_128gb_ddr5', name: 'DDR5 128GB G.Skill 7200', category: 'ram', price: 40000, income: 550, rarity: 'legendary', icon: 'circuit-board' },
-  { id: 'gpu_quantum', name: 'Quantum Rig Accelerator X', category: 'gpu', price: 300000, income: 4500, rarity: 'mythic', icon: 'cpu' },
+  { id: 'gpu_quantum', name: 'Quantum Rig Accelerator X', category: 'gpu', price: 300000, income: 4500, rarity: 'mythic', icon: 'monitor' },
   { id: 'cpu_ai_core', name: 'Neural AI Super-Core v9', category: 'cpu', price: 500000, income: 8000, rarity: 'mythic', icon: 'zap' }
         ];
 
