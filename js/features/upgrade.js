@@ -118,6 +118,9 @@ export function updateCalc() {
   $('in-value').innerText = `${fmt(c.inputValue)} 🪙`;
   $('calc-chance').innerText = fmtChance(c.chance);
   $('calc-multiplier').innerText = fmtMultiplier(c.targetValue, c.inputValue);
+  const spins = game.freeSpins || 0;
+  $('free-spins').innerText = spins;
+  $('free-spins-badge').classList.toggle('hidden', spins <= 0);
 
   const btn = $('btn-upgrade-action');
   const ready = c.chance > 0 && !!ui.target;
@@ -203,6 +206,9 @@ export function performUpgrade() {
   const target = ui.target;
   const lostItems = c.items.slice();
   const chance = c.chance;
+  const coinsSpent = c.added;
+  const free = (game.freeSpins || 0) > 0;
+  if (free) game.freeSpins--;
 
   game.coins -= c.added;
   const consumed = new Set(c.items.map((i) => i.instanceId));
@@ -219,16 +225,22 @@ export function performUpgrade() {
   renderInventory();
   setStatus('Вращение…', 'text-amber-400');
 
-  const roll = secureRandom() * 100;
+  const roll = game.rigged ? secureRandom() * chance : secureRandom() * 100;
   const isWin = roll < chance;
 
   spinArrow(roll * 3.6, () => {
     ui.spinning = false;
-    finishUpgrade({ isWin, chance, roll, target, lostItems });
+    finishUpgrade({ isWin, chance, roll, target, lostItems, free, coinsSpent });
   });
 }
 
-function finishUpgrade({ isWin, chance, roll, target, lostItems }) {
+function finishUpgrade({ isWin, chance, roll, target, lostItems, free, coinsSpent }) {
+  const refunded = free && !isWin;
+  if (refunded) {
+    game.inventory.push(...lostItems);
+    game.coins += coinsSpent;
+  }
+
   game.upgradeCount++;
   game.upgradeHistory.unshift({
     id: game.upgradeCount,
@@ -250,7 +262,7 @@ function finishUpgrade({ isWin, chance, roll, target, lostItems }) {
     setStatus('Промах', 'text-red-400');
   }
 
-  showResult(isWin, target, { chance, roll, lostItems });
+  showResult(isWin, target, { chance, roll, lostItems, refunded });
   renderHistory();
   hooks.refresh();
   saveGame();
@@ -273,7 +285,9 @@ function showResult(isWin, item, info) {
     card.className = 'bg-[#17181d] border-2 border-red-500 rounded-2xl max-w-sm w-full p-6 flex flex-col items-center text-center gap-4 shadow-2xl';
     title.innerText = 'Неудача';
     title.className = 'text-2xl font-black text-red-500';
-    $('result-desc').innerText = `Апгрейд сорвался. Потеряно: ${lost}`;
+    $('result-desc').innerText = info.refunded
+      ? 'Бесплатная крутка: предметы и монеты возвращены'
+      : `Апгрейд сорвался. Потеряно: ${lost}`;
     iconBox.className = 'w-20 h-20 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-500';
     iconBox.innerHTML = '<i data-lucide="x-circle" class="w-10 h-10"></i>';
   }

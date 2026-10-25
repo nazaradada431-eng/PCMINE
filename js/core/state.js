@@ -13,6 +13,9 @@ export const game = {
   upgradeCount: 0,
   rigSlots: { gpu: null, cpu: null, ram: null, cooler: null, psu: null, mobo: null },
   audioEnabled: true,
+  usedPromos: [],
+  freeSpins: 0,
+  rigged: false,
   lastSeen: Date.now()
 };
 

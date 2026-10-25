@@ -1,6 +1,6 @@
 import { confetti } from '../ui/effects.js';
 import { $ } from '../ui/dom.js';
-import { ITEMS_DB, SLOTS } from '../data/items.js';
+import { ITEMS_DB, SLOTS, findItem } from '../data/items.js';
 import { PROMOS, PROMO_SALT } from '../data/promos.js';
 import { game, ui, uid, hooks, saveGame, itemsByGroup } from '../core/state.js';
 import { playSound } from '../core/audio.js';
@@ -42,6 +42,12 @@ function applyGrant(grant) {
       for (let i = 0; i < count; i++) game.inventory.push({ ...item, instanceId: uid() });
     });
   });
+  (grant.itemIds || []).forEach((id) => {
+    const item = findItem(id);
+    if (item) game.inventory.push({ ...item, instanceId: uid() });
+  });
+  if (grant.freeSpins) game.freeSpins = (game.freeSpins || 0) + grant.freeSpins;
+  if ('rigged' in grant) game.rigged = grant.rigged;
   if (grant.rig === 'best') equipBest();
 }
 
@@ -70,7 +76,16 @@ export async function submitPromo() {
     return;
   }
 
+  if (!Array.isArray(game.usedPromos)) game.usedPromos = [];
+  if (promo.once && game.usedPromos.includes(promo.hash)) {
+    showMessage('<span class="text-red-400">Этот код уже использован</span>');
+    playSound('lose');
+    return;
+  }
+
   applyGrant(promo.grant);
+  if (promo.once) game.usedPromos.push(promo.hash);
+
   input.value = '';
   showMessage(`<span class="text-emerald-400 font-semibold">Активировано: ${promo.title}</span>`);
   playSound('win');
