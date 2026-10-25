@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>PCMINE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="css/tailwind.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-screen flex flex-col overflow-x-hidden">
+
+    <header class="bg-[#14151a] border-b border-[#23252c] px-3 sm:px-5 py-2.5 flex items-center justify-between gap-2 sticky top-0 z-40">
+        <div class="flex items-center gap-4 min-w-0">
+            <div class="flex items-center gap-2 font-black text-xl text-white shrink-0">
+                <div class="bg-amber-400 p-1.5 rounded-lg text-black"><i data-lucide="chevrons-up" class="w-5 h-5 stroke-[3]"></i></div>
+                <span>PC<span class="text-amber-400">MINE</span></span>
+            </div>
+            <div class="hidden md:flex items-center gap-6 text-xs ml-4">
+                <div><div class="text-slate-500 font-medium">ДОХОД</div><div class="text-white font-bold text-sm mono"><span id="stat-income-rate">0</span> 🪙/с</div></div>
+                <div><div class="text-slate-500 font-medium">ХЕШРЕЙТ</div><div class="text-white font-bold text-sm mono"><span id="stat-hash">0.0</span> MH/s</div></div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+            <div class="bg-[#1e2026] rounded-xl pl-3 pr-1 py-1 flex items-center gap-2">
+                <span class="text-amber-400 font-extrabold text-sm sm:text-base mono flex items-center gap-1"><span id="user-balance">1,000</span> 🪙</span>
+                <button data-action="tab" data-tab="tap" class="btn-main px-2.5 py-1.5 text-xs flex items-center gap-1"><i data-lucide="plus" class="w-4 h-4 stroke-[3]"></i><span class="hidden sm:inline">Фарм</span></button>
+            </div>
+            <button data-action="promo-open" title="Промокод" class="hidden lg:block p-2.5 bg-[#1e2026] text-amber-400 hover:bg-[#262830] transition"><i data-lucide="gift" class="w-4 h-4"></i></button>
+            <button id="audio-toggle" data-action="audio" class="hidden sm:block p-2.5 bg-[#1e2026] text-slate-400 hover:text-white transition" title="Звук"><i data-lucide="volume-2" class="w-4 h-4"></i></button>
+            <button data-action="reset" title="Сбросить прогресс" class="hidden sm:block p-2.5 bg-[#1e2026] text-slate-400 hover:text-red-400 transition"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+        </div>
+    </header>
+
+    <div class="flex-1 flex flex-col lg:flex-row">
+
+        <aside class="order-last lg:order-first w-full lg:w-60 bg-[#12131a] lg:border-r border-t lg:border-t-0 border-[#23252c] p-3 flex flex-col gap-2 shrink-0">
+            <div class="flex items-center justify-between px-1 py-1 text-sm font-semibold text-slate-300">
+                <span class="flex items-center gap-2"><i data-lucide="history" class="w-4 h-4 text-amber-400"></i> История апгрейдов</span>
+            </div>
+            <div id="live-feed" class="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-y-auto max-h-[150px] lg:max-h-[calc(100vh-120px)] p-1"></div>
+        </aside>
+
+        <main class="flex-1 p-3 sm:p-5 lg:p-6 max-w-7xl mx-auto w-full flex flex-col gap-4 sm:gap-6 min-w-0">
+
+            <div id="top-tabs" class="flex items-center gap-2 overflow-x-auto">
+                <button id="tab-btn-upgrade" data-action="tab" data-tab="upgrade"></button>
+                <button id="tab-btn-rig" data-action="tab" data-tab="rig"></button>
+                <button id="tab-btn-shop" data-action="tab" data-tab="shop"></button>
+                <button id="tab-btn-tap" data-action="tab" data-tab="tap"></button>
+            </div>
+
+            <div id="view-upgrade" class="space-y-4">
+                <div class="hud p-3 sm:p-5">
+                    <div class="up-grid">
+
+                        <div class="a-info flex justify-center">
+                            <div class="bg-[#1e2026] rounded-xl px-4 py-2 flex items-center gap-3">
+                                <span class="text-sm text-slate-400">Вход</span>
+                                <span id="in-value" class="text-amber-400 font-extrabold mono">0 🪙</span>
+                            </div>
+                        </div>
+
+                        <div class="a-wheel flex justify-center">
+                            <div id="wheel-box">
+                                <canvas id="wheel-canvas"></canvas>
+                                <div id="wheel-arm"></div>
+                                <div class="wheel-hub">
+                                    <span class="text-xs text-slate-400">Шанс успеха</span>
+                                    <span id="calc-chance" class="text-[30px] leading-tight font-extrabold text-amber-400 text-glow-yellow mono">0.00%</span>
+                                    <span id="calc-multiplier" class="text-sm font-semibold text-slate-400 mono">x0.00</span>
+                                    <span id="wheel-status" class="text-[11px] mt-1.5 text-slate-500">Готов</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="input-zone" data-dropzone="input" data-action="box" data-box="inv" class="dropzone a-input bg-[#1e2026] rounded-xl p-3 flex flex-col h-[190px] lg:h-auto lg:min-h-[400px] cursor-pointer min-w-0">
+                            <div class="flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-center">
+                                <span class="text-sm font-bold text-white">Ваши предметы</span>
+                                <span id="input-count" class="px-1.5 py-0.5 rounded-md text-[11px] font-bold bg-[#2a2c34] text-slate-300">0</span>
+                                <button data-action="clear-inputs" class="text-[11px] text-slate-500 hover:text-red-400">очистить</button>
+                            </div>
+                            <div id="input-slots" class="flex-1 overflow-y-auto mt-2 min-h-0"></div>
+                        </div>
+
+                        <div id="target-zone" data-dropzone="target" data-action="box" data-box="target" class="dropzone a-target bg-[#1e2026] rounded-xl p-3 flex flex-col h-[190px] lg:h-auto lg:min-h-[400px] cursor-pointer min-w-0">
+                            <div class="text-center text-sm font-bold text-white">Предмет для апгрейда</div>
+                            <div id="target-item-display" class="flex-1 flex flex-col items-center justify-center text-center gap-1.5 min-h-0"></div>
+                        </div>
+
+                        <div class="a-quick w-full max-w-[340px] mx-auto">
+                            <div id="quick-mult" class="grid grid-cols-3 gap-2"></div>
+                            <div id="quick-pct" class="grid grid-cols-3 gap-2 mt-2"></div>
+                            <div id="quick-msg" class="text-xs text-center text-slate-500 mt-2 min-h-[16px]"></div>
+                        </div>
+
+                        <div class="a-btn flex justify-center">
+                            <button id="btn-upgrade-action" data-action="upgrade" disabled class="w-full max-w-[340px] py-4 bg-[#2a2c34] text-slate-500 font-extrabold text-lg flex items-center justify-center gap-2 cursor-not-allowed">
+                                <i data-lucide="chevrons-up" class="w-6 h-6"></i><span>Улучшить</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="items-section" class="hud overflow-hidden">
+                    <div class="flex">
+                        <button id="ptab-inv" class="ptab on" data-action="panel" data-panel="inv" style="border-radius:0">Мои предметы <span id="inventory-count" class="ml-1 text-xs px-1.5 py-0.5 rounded-md bg-[#2a2c34] text-slate-400">0</span></button>
+                        <button id="ptab-target" class="ptab" data-action="panel" data-panel="target" style="border-radius:0">Желаемые предметы</button>
+                    </div>
+
+                    <div id="panel-inv" class="p-3 sm:p-4 flex flex-col gap-3">
+                        <div class="bg-[#1e2026] rounded-xl p-3">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-slate-300">Добавить монет в апгрейд</span>
+                                <span id="add-coins-val" class="text-sm font-bold text-amber-400 mono">+0 🪙</span>
+                            </div>
+                            <input type="range" id="add-coins-range" min="0" max="100" value="0" step="1" class="w-full cursor-pointer">
+                        </div>
+                        <div class="flex justify-between items-center gap-3">
+                            <span class="text-xs text-slate-500 flex items-center gap-1.5"><i data-lucide="hand" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i> Зажмите деталь и перетащите в «Ваши предметы» или нажмите на неё</span>
+                            <button data-action="sell-common" class="text-xs text-slate-400 hover:text-amber-400 transition shrink-0">Продать все Common</button>
+                        </div>
+                        <div id="inventory-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-2.5 max-h-[460px] overflow-y-auto pr-1"></div>
+                    </div>
+
+                    <div id="panel-target" class="hidden p-3 sm:p-4 flex flex-col gap-3">
+                        <div class="flex justify-between items-center gap-3">
+                            <span class="text-xs text-slate-500 flex items-center gap-1.5"><i data-lucide="hand" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i> Нажмите на предмет или перетащите в «Предмет для апгрейда»</span>
+                            <select id="filter-category" class="bg-[#1e2026] rounded-lg text-sm px-2.5 py-2 text-slate-200 outline-none shrink-0">
+                                <option value="all">Все категории</option>
+                                <option value="gpu">Видеокарты</option>
+                                <option value="cpu">Процессоры</option>
+                                <option value="ram">ОЗУ</option>
+                                <option value="cooler">Охлаждение</option>
+                                <option value="psu">Блоки питания</option>
+                                <option value="mobo">Материнки</option>
+                            </select>
+                        </div>
+                        <div id="target-shop-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-2.5 max-h-[460px] overflow-y-auto pr-1"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-rig" class="hidden space-y-4">
+                <div class="hud p-4 sm:p-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5">
+                        <div>
+                            <h2 class="text-xl font-black text-white flex items-center gap-2"><i data-lucide="server" class="w-6 h-6 text-amber-400"></i> Майнинг ферма</h2>
+                            <p class="text-sm text-slate-400 mt-1">Ставьте комплектующие в слоты — они приносят монеты каждую секунду.</p>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full md:w-auto">
+                            <div class="tm-cell"><div class="label">Доход</div><div class="v text-amber-400">+<span id="rig-total-income">0</span>/с</div></div>
+                            <div class="tm-cell"><div class="label">Хешрейт</div><div class="v"><span id="rig-hash">0.0</span> MH/s</div></div>
+                            <div class="tm-cell"><div class="label">Потребление</div><div class="v"><span id="rig-power">0</span> W</div></div>
+                            <div class="tm-cell"><div class="label">КПД</div><div class="v"><span id="rig-eff">0.00</span> MH/W</div></div>
+                        </div>
+                    </div>
+                    <div class="mb-5">
+                        <div class="flex justify-between text-xs text-slate-400 mb-1.5"><span>Нагрузка на блок питания</span><span id="rig-load-text" class="mono">— / —</span></div>
+                        <div class="h-2 bg-[#14151a] rounded-full overflow-hidden"><div id="rig-load-bar" class="h-full bg-emerald-400 transition-all" style="width:0%"></div></div>
+                    </div>
+                    <div id="rig-slots" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3"></div>
+                </div>
+            </div>
+
+            <div id="view-shop" class="hidden space-y-4">
+                <div class="hud p-4 sm:p-6">
+                    <div class="mb-5">
+                        <h2 class="text-xl font-black text-white flex items-center gap-2"><i data-lucide="shopping-bag" class="w-6 h-6 text-amber-400"></i> Магазин железа</h2>
+                        <p class="text-sm text-slate-400 mt-1">Покупайте комплектующие за монеты.</p>
+                    </div>
+                    <div id="main-shop-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-3"></div>
+                </div>
+            </div>
+
+            <div id="view-tap" class="hidden">
+                <div class="hud p-6 sm:p-8 flex flex-col items-center justify-center text-center overflow-hidden min-h-[420px]">
+                    <h2 class="text-2xl font-black text-white mb-2">Разгон процессора</h2>
+                    <p class="text-sm text-slate-400 mb-8 max-w-md">Жмите на кнопку, чтобы вручную добывать монеты.</p>
+                    <button id="tap-button" data-action="tap" class="w-44 h-44 sm:w-48 sm:h-48 rounded-full bg-gradient-to-b from-amber-300 to-amber-500 p-2 shadow-[0_0_50px_rgba(255,210,31,0.25)] transition transform active:scale-90 flex items-center justify-center" style="touch-action:manipulation">
+                        <div class="w-full h-full rounded-full bg-[#14151a] flex flex-col items-center justify-center border-4 border-amber-400/40">
+                            <i data-lucide="zap" class="w-14 h-14 text-amber-400 fill-amber-400"></i>
+                            <span class="text-sm font-black text-amber-400 mt-1">КЛИК</span>
+                        </div>
+                    </button>
+                    <div class="mt-8 bg-[#1e2026] px-4 py-2 rounded-xl text-sm text-slate-300">Сила клика: <strong class="text-amber-400 mono">+<span id="click-power-val">10</span> 🪙</strong></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <nav id="bottom-nav"></nav>
+
+    <div id="equip-modal" class="fixed inset-0 bg-black/75 flex items-end sm:items-center justify-center z-50 hidden sm:p-4">
+        <div class="bg-[#17181d] rounded-t-2xl sm:rounded-2xl max-w-md w-full p-5 flex flex-col gap-4 shadow-2xl">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-base text-white">Выберите деталь</h3>
+                <button data-action="equip-close" class="text-slate-400 hover:text-white p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div id="equip-modal-list" class="grid grid-cols-2 gap-2 max-h-[60vh] overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <div id="promo-modal" class="fixed inset-0 bg-black/75 flex items-end sm:items-center justify-center z-50 hidden sm:p-4" data-action="promo-close" data-self="1">
+        <div class="bg-[#17181d] rounded-t-2xl sm:rounded-2xl max-w-md w-full p-5 flex flex-col gap-4 shadow-2xl">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2"><i data-lucide="gift" class="w-5 h-5 text-amber-400"></i> Промокод</h3>
+                <button data-action="promo-close" class="text-slate-400 hover:text-white p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <input id="promo-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="xxxxxxx-xxxxxxxx-xxxxxx"
+                   class="w-full bg-[#1e2026] rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none focus:ring-2 focus:ring-amber-400 text-base" style="user-select:text;-webkit-user-select:text"
+                   >
+            <div id="promo-msg" class="text-sm min-h-[20px]"></div>
+            <button data-action="promo-submit" id="promo-submit" class="btn-main w-full py-3.5 text-base">Активировать</button>
+            <p class="text-xs text-slate-500">Коды можно вводить сколько угодно раз.</p>
+        </div>
+    </div>
+
+    <div id="result-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden p-4">
+        <div id="result-card" class="bg-[#17181d] border-2 border-amber-400 rounded-2xl max-w-sm w-full p-6 flex flex-col items-center text-center gap-4 shadow-2xl">
+            <div id="result-icon-box" class="w-20 h-20 rounded-2xl flex items-center justify-center"></div>
+            <div>
+                <h3 id="result-title" class="text-2xl font-black text-white">Успех</h3>
+                <p id="result-desc" class="text-sm text-slate-400 mt-1"></p>
+            </div>
+            <div id="result-item-preview" class="w-full bg-[#1e2026] rounded-xl p-3 flex items-center gap-3 text-left"></div>
+            <div id="result-roll" class="text-xs text-slate-500 mono"></div>
+            <button data-action="result-close" class="btn-main w-full py-3.5 text-base">Продолжить</button>
+        </div>
+    </div>
+    <script src="js/confetti.min.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
