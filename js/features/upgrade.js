@@ -241,7 +241,7 @@ export function performUpgrade() {
   const roll = game.rigged ? secureRandom() * chance : secureRandom() * 100;
   const isWin = roll < chance;
 
-  spinArrow(roll * 3.6, () => {
+  spinArrow(roll * 3.6, chance, () => {
     ui.spinning = false;
     finishUpgrade({ isWin, chance, roll, target, lostItems, free, coinsSpent });
   });

@@ -49,15 +49,19 @@ function drawTrack(ctx) {
 function drawWinZone(ctx, chance) {
   const exact = (chance / 100) * TAU;
   const drawn = Math.max(exact, (MIN_VISIBLE_DEG * Math.PI) / 180);
+  const start = Math.PI / 2 - drawn / 2;
+  const end = start + drawn;
   const gradient = ctx.createLinearGradient(0, CENTER - RADIUS, 0, CENTER + RADIUS);
   gradient.addColorStop(0, '#ffe033');
-  gradient.addColorStop(1, '#ff7a1a');
+  gradient.addColorStop(0.58, '#ffd21f');
+  gradient.addColorStop(0.84, '#ff8a18');
+  gradient.addColorStop(1, '#ff3b30');
 
   ctx.save();
   ctx.shadowColor = 'rgba(255,190,30,.5)';
   ctx.shadowBlur = 10;
   ctx.beginPath();
-  ctx.arc(CENTER, CENTER, RADIUS, TOP, TOP + drawn);
+  ctx.arc(CENTER, CENTER, RADIUS, start, end);
   ctx.strokeStyle = gradient;
   ctx.lineWidth = WIDTH;
   ctx.lineCap = 'butt';
@@ -65,7 +69,7 @@ function drawWinZone(ctx, chance) {
   ctx.restore();
 
   if (drawn >= TAU - 0.001) return;
-  [TOP, TOP + drawn].forEach((a) => {
+  [start, end].forEach((a) => {
     const inner = RADIUS - WIDTH / 2 - 3;
     const outer = RADIUS + WIDTH / 2 + 3;
     ctx.beginPath();
@@ -86,10 +90,11 @@ export function drawWheel(chance) {
   if (chance > 0) drawWinZone(ctx, chance);
 }
 
-export function spinArrow(rollDeg, onDone) {
+export function spinArrow(rollDeg, chance, onDone) {
   const arm = $('wheel-arm');
   const start = ui.wheelAngle;
-  const delta = ((rollDeg - (start % 360)) + 360) % 360 + 6 * 360;
+  const targetDeg = rollDeg + 180 - chance * 1.8;
+  const delta = ((targetDeg - (start % 360)) + 360) % 360 + 6 * 360;
   const end = start + delta;
   const duration = 5200;
   const t0 = performance.now();
