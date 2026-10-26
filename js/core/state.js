@@ -26,7 +26,7 @@ export const ui = {
   inputIds: [],
   target: null,
   spinning: false,
-  wheelAngle: 0,
+  wheelAngle: 180,
   lastChance: -1,
   quick: null,
   activeRigId: null

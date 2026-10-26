@@ -16,6 +16,7 @@ export function setupCanvas() {
   canvas.width = SIZE * dpr;
   canvas.height = SIZE * dpr;
   canvas.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
+  $('wheel-arm').style.transform = `rotate(${ui.wheelAngle}deg)`;
 }
 
 function drawTicks(ctx) {
@@ -94,7 +95,9 @@ export function spinArrow(rollDeg, chance, onDone) {
   const arm = $('wheel-arm');
   const start = ui.wheelAngle;
   const targetDeg = rollDeg + 180 - chance * 1.8;
-  const delta = ((targetDeg - (start % 360)) + 360) % 360 + 6 * 360;
+  const currentAngle = ((start % 360) + 360) % 360;
+  const targetAngle = ((targetDeg % 360) + 360) % 360;
+  const delta = -(((currentAngle - targetAngle + 360) % 360) + 6 * 360);
   const end = start + delta;
   const duration = 5200;
   const t0 = performance.now();
