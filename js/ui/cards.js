@@ -1,6 +1,16 @@
 import { specs } from '../data/items.js';
 import { fmt } from '../core/format.js';
 
+const COMPONENT_ASSETS = {
+  gpu: 'gpu.svg', cpu: 'cpu.svg', ram: 'ram.svg', cooler: 'cooler.svg',
+  psu: 'psu.svg', mobo: 'motherboard.svg'
+};
+
+export function componentImage(item, className = 'component-art') {
+  const file = COMPONENT_ASSETS[item?.category];
+  return file ? `<img src="assets/${file}" class="${className}" alt="${item.name}" draggable="false">` : '';
+}
+
 export function specText(item) {
   const s = specs(item);
   return `${s.isPsu ? 'CAP' : 'TDP'} ${s.watt}W · ${s.hash.toFixed(1)} MH/s`;
@@ -14,7 +24,7 @@ export function specLine(item) {
 export function cardInner(item, extra = '') {
   return `
     <div class="flex justify-between items-start">
-      <i data-lucide="${item.icon}" class="w-5 h-5 text-slate-300"></i>
+      ${componentImage(item, 'component-art component-art-card')}
       <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-black/50 text-slate-300">${item.rarity}</span>
     </div>
     <div class="my-2">

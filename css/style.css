@@ -109,6 +109,16 @@
 
 .rig-card { aspect-ratio:1 / 1; }
 .rig-card-title { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; overflow-wrap:anywhere; }
+        .component-art { display:block; object-fit:contain; flex:none; }
+        .component-art-card { width:56px; height:42px; margin:-8px 0 -6px -8px; }
+        .component-art-shop { width:100%; height:92px; margin-bottom:8px; }
+        .component-art-mini { width:34px; height:28px; }
+        .component-art-target { width:90%; height:90%; }
+        .component-art-slot { width:64px; height:48px; }
+        .upgrade-item-roll { animation:item-roll-swap .23s ease-out both; }
+        @keyframes item-roll-swap { from { opacity:.35; transform:translateY(7px) scale(.97); filter:blur(2px); } to { opacity:1; transform:translateY(0) scale(1); filter:blur(0); } }
+        .upgrade-target-roll { width:100px; height:100px; display:flex; align-items:center; justify-content:center; border:1px solid color-mix(in srgb,var(--rarity-glow),transparent 25%); border-radius:16px; background:color-mix(in srgb,var(--rarity-glow),transparent 91%); box-shadow:0 0 14px color-mix(in srgb,var(--rarity-glow),transparent 55%), inset 0 0 18px color-mix(in srgb,var(--rarity-glow),transparent 88%); animation:rarity-roll-pulse .46s ease-in-out infinite alternate; }
+        @keyframes rarity-roll-pulse { from { transform:scale(.94); filter:brightness(.9); } to { transform:scale(1.04); filter:brightness(1.35); } }
 
 .qbtn .gloss { display:none; }
 .qbtn .s0, .qbtn .s1, .qbtn .s2 { stop-color:#16171d; stop-opacity:1; }

@@ -1,6 +1,6 @@
 import { $ } from './dom.js';
 import { icons } from './icons.js';
-import { cardInner, specLine, specText } from './cards.js';
+import { cardInner, componentImage, specLine, specText } from './cards.js';
 import { ITEMS_DB, SLOTS, specs } from '../data/items.js';
 import { fmt } from '../core/format.js';
 import { game, ui } from '../core/state.js';
@@ -87,9 +87,9 @@ export function renderShop() {
     return `
       <div class="rarity-${item.rarity} border p-3 sm:p-4 flex flex-col justify-between">
         <div>
-          <div class="flex justify-between items-start mb-2">
-            <i data-lucide="${item.icon}" class="w-6 h-6 text-slate-200"></i>
-            <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-black/60 text-slate-300">${item.rarity}</span>
+          <div class="relative mb-2">
+            ${componentImage(item, 'component-art component-art-shop')}
+            <span class="absolute top-0 right-0 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-black/60 text-slate-300">${item.rarity}</span>
           </div>
           <div class="font-bold text-sm text-white">${item.name}</div>
           <div class="text-xs text-amber-400 font-semibold mt-0.5 mono">+${item.income} 🪙/сек</div>
@@ -104,7 +104,7 @@ export function renderShop() {
   icons();
 }
 
-export function renderSlots(items) {
+export function renderSlots(items, rolling = false) {
   $('input-count').innerText = items.length;
   const slots = $('input-slots');
 
@@ -119,8 +119,8 @@ export function renderSlots(items) {
     slots.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-1.5">${items
       .map(
         (it) => `
-        <div class="rarity-${it.rarity} border px-2 py-1.5 relative flex items-center gap-2 min-w-0">
-          <i data-lucide="${it.icon}" class="w-4 h-4 text-amber-400 shrink-0"></i>
+        <div class="rarity-${it.rarity} border px-2 py-1.5 relative flex items-center gap-2 min-w-0 ${rolling ? 'upgrade-item-roll' : ''}">
+          ${componentImage(it, 'component-art component-art-mini shrink-0')}
           <div class="min-w-0 flex-1">
             <div class="text-[11px] font-bold text-white truncate">${it.name}</div>
             <div class="mono text-[10px] text-amber-400 font-semibold">${fmt(it.price)} 🪙</div>
@@ -135,7 +135,7 @@ export function renderSlots(items) {
   if (ui.target) {
     const t = ui.target;
     display.innerHTML = `
-      <div class="w-16 h-16 sm:w-20 sm:h-20 lg:w-28 lg:h-28 rarity-${t.rarity} border flex items-center justify-center text-amber-400"><i data-lucide="${t.icon}" class="w-8 h-8 lg:w-12 lg:h-12"></i></div>
+      <div class="w-16 h-16 sm:w-20 sm:h-20 lg:w-28 lg:h-28 rarity-${t.rarity} border flex items-center justify-center overflow-hidden">${componentImage(t, 'component-art component-art-target')}</div>
       <span class="text-xs sm:text-sm font-bold text-white leading-tight px-1">${t.name}</span>
       <span class="mono text-sm text-amber-400 font-bold">${fmt(t.price)} 🪙</span>`;
   } else {
@@ -222,7 +222,7 @@ export function renderRigDetails(rigId) {
       const eq = rig.slots[slot.cat];
       return `<div class="bg-[#13141a] border border-[#242630] rounded-xl p-2.5 min-h-[145px] flex flex-col items-center justify-between text-center">
         <span class="label">${slot.label}</span>
-        <div class="my-2 min-w-0 w-full flex flex-col items-center">${eq ? `<i data-lucide="${eq.icon}" class="w-7 h-7 text-amber-400 mb-1"></i><span class="text-[11px] font-bold text-white leading-tight">${eq.name}</span><span class="text-[10px] text-amber-400 mono mt-1">+${eq.income}/с</span><span class="text-[9px] text-slate-500 mt-1">${specText(eq)}</span>` : `<i data-lucide="${slot.icon}" class="w-7 h-7 text-slate-600 mb-1"></i><span class="text-xs text-slate-500">Не установлено</span>`}</div>
+        <div class="my-2 min-w-0 w-full flex flex-col items-center">${eq ? `${componentImage(eq, 'component-art component-art-slot mb-1')}<span class="text-[11px] font-bold text-white leading-tight">${eq.name}</span><span class="text-[10px] text-amber-400 mono mt-1">+${eq.income}/с</span><span class="text-[9px] text-slate-500 mt-1">${specText(eq)}</span>` : `<i data-lucide="${slot.icon}" class="w-7 h-7 text-slate-600 mb-1"></i><span class="text-xs text-slate-500">Не установлено</span>`}</div>
         <div class="w-full flex gap-1">${eq ? `<button data-action="unequip" data-rig="${rig.id}" data-cat="${slot.cat}" class="flex-1 py-1.5 bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white border border-red-500/30 rounded-lg text-[10px] font-semibold transition">Снять</button>` : ''}<button data-action="equip-open" data-rig="${rig.id}" data-cat="${slot.cat}" class="flex-1 py-1.5 bg-[#1c1e26] hover:bg-[#262831] text-slate-200 rounded-lg text-[10px] font-semibold transition">${eq ? 'Заменить' : 'Установить'}</button></div>
       </div>`;
     }).join('')}</div>`;
