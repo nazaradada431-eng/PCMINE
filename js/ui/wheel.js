@@ -123,7 +123,19 @@ export function spinArrow(rollDeg, chance, onDone) {
     }
     ui.wheelAngle = end;
     arm.style.transform = `rotate(${end}deg)`;
-    onDone();
+    const endAngle = ((end % 360) + 360) % 360;
+    const returnDelta = ((180 - endAngle + 540) % 360) - 180;
+    const homeAngle = end + returnDelta;
+    arm.style.transition = 'transform 420ms cubic-bezier(.2,.8,.2,1)';
+    requestAnimationFrame(() => {
+      arm.style.transform = `rotate(${homeAngle}deg)`;
+    });
+    window.setTimeout(() => {
+      arm.style.transition = '';
+      arm.style.transform = 'rotate(180deg)';
+      ui.wheelAngle = 180;
+      onDone();
+    }, 440);
   }
 
   requestAnimationFrame(frame);
