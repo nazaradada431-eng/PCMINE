@@ -15,7 +15,6 @@ import { ITEMS_DB } from '../data/items.js';
 import { fmt, fmtChance, fmtMultiplier } from '../core/format.js';
 import { game, ui, uid, hooks, saveGame } from '../core/state.js';
 import { playSound } from '../core/audio.js';
-import { componentImage } from '../ui/cards.js';
 
 const MAX_CHANCE = 95;
 const QUICK_MULTIPLIERS = [
@@ -29,32 +28,6 @@ const QUICK_PERCENTS = [
   { value: 75, color: 'green' }
 ];
 const SHAPES = ['left', 'mid', 'right'];
-let itemRollTimer = null;
-const rarityGlow = {
-  common: '#9ca3af', uncommon: '#60a5fa', rare: '#c084fc',
-  epic: '#f472b6', legendary: '#fbbf24', mythic: '#fb7185'
-};
-
-function stopItemRoll() {
-  if (itemRollTimer) window.clearInterval(itemRollTimer);
-  itemRollTimer = null;
-}
-
-function startItemRoll(selectedItems) {
-  stopItemRoll();
-  if (!selectedItems.length) return;
-  const candidates = ITEMS_DB;
-  const targetDisplay = $('target-item-display');
-  const paint = () => {
-    const rolled = selectedItems.map(() => candidates[Math.floor(Math.random() * candidates.length)]);
-    renderSlots(rolled, true);
-    const target = candidates[Math.floor(Math.random() * candidates.length)];
-    const color = rarityGlow[target.rarity] || '#fbbf24';
-    targetDisplay.innerHTML = `<div class="upgrade-target-roll rarity-${target.rarity}" style="--rarity-glow:${color}">${componentImage(target, 'component-art component-art-target')}</div><span class="text-xs sm:text-sm font-bold text-white leading-tight px-1">${target.name}</span><span class="mono text-sm text-amber-400 font-bold">${fmt(target.price)} 🪙</span>`;
-  };
-  paint();
-  itemRollTimer = window.setInterval(paint, 115);
-}
 
 function setUpgradeReady(ready) {
   const btn = $('btn-upgrade-action');
@@ -260,7 +233,6 @@ export function performUpgrade() {
   clearQuick();
 
   ui.spinning = true;
-  startItemRoll(c.items);
   setUpgradeReady(false);
   renderBalance();
   renderInventory();
@@ -270,7 +242,6 @@ export function performUpgrade() {
   const isWin = roll < chance;
 
   spinArrow(roll * 3.6, () => {
-    stopItemRoll();
     ui.spinning = false;
     finishUpgrade({ isWin, chance, roll, target, lostItems, free, coinsSpent });
   });

@@ -5,6 +5,55 @@ import { ITEMS_DB, SLOTS, specs } from '../data/items.js';
 import { fmt } from '../core/format.js';
 import { game, ui } from '../core/state.js';
 
+let emptyPreviewTimer = null;
+const previewGlow = {
+  common: '#9ca3af', uncommon: '#60a5fa', rare: '#c084fc',
+  epic: '#f472b6', legendary: '#fbbf24', mythic: '#fb7185'
+};
+
+function randomComponent() {
+  return ITEMS_DB[Math.floor(Math.random() * ITEMS_DB.length)];
+}
+
+function emptyPreview(item, side) {
+  const color = side === 'target' ? previewGlow[item.rarity] : '#ffd21f';
+  const instruction = side === 'target' ? 'Выберите цель апгрейда' : 'Добавьте компоненты для апгрейда';
+  return `<div class="upgrade-empty-preview" data-preview="${side}" style="--preview-glow:${color}">
+    <div class="empty-preview-art">${componentImage(item, 'component-art empty-preview-image')}</div>
+    <div class="empty-preview-name">${item.name}</div>
+    <div class="empty-preview-hint">${instruction}</div>
+  </div>`;
+}
+
+function updateEmptyPreviews() {
+  document.querySelectorAll('.upgrade-empty-preview').forEach((preview) => {
+    const item = randomComponent();
+    const img = preview.querySelector('img');
+    const name = preview.querySelector('.empty-preview-name');
+    if (!img || !name) return;
+    preview.classList.add('is-changing');
+    window.setTimeout(() => {
+      if (!preview.isConnected) return;
+      img.src = `assets/${item.category === 'mobo' ? 'motherboard' : item.category}.svg`;
+      img.alt = item.name;
+      name.textContent = item.name;
+      if (preview.dataset.preview === 'target') {
+        preview.style.setProperty('--preview-glow', previewGlow[item.rarity] || '#fbbf24');
+      }
+      preview.classList.remove('is-changing');
+    }, 220);
+  });
+}
+
+function syncEmptyPreviewRoll() {
+  if (document.querySelector('.upgrade-empty-preview') && !emptyPreviewTimer) {
+    emptyPreviewTimer = window.setInterval(updateEmptyPreviews, 1500);
+  } else if (!document.querySelector('.upgrade-empty-preview') && emptyPreviewTimer) {
+    window.clearInterval(emptyPreviewTimer);
+    emptyPreviewTimer = null;
+  }
+}
+
 export const TABS = [
   { id: 'upgrade', label: 'Апгрейдер', short: 'Апгрейд', icon: 'zap' },
   { id: 'rig', label: 'Майнинг ПК', short: 'Ферма', icon: 'cpu' },
@@ -104,22 +153,17 @@ export function renderShop() {
   icons();
 }
 
-export function renderSlots(items, rolling = false) {
+export function renderSlots(items) {
   $('input-count').innerText = items.length;
   const slots = $('input-slots');
 
   if (!items.length) {
-    slots.innerHTML = `
-      <div class="h-full flex flex-col items-center justify-center gap-1.5 text-center px-1">
-        <i data-lucide="chevrons-down" class="w-10 h-10 text-amber-400/50"></i>
-        <span class="text-xs font-semibold text-slate-300">Выберите предметы и/или баланс для использования</span>
-        <span class="text-[11px] text-slate-500">Можно выбрать несколько предметов</span>
-      </div>`;
+    slots.innerHTML = `<div class="empty-upgrade-state">${emptyPreview(randomComponent(), 'input')}</div>`;
   } else {
     slots.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-1.5">${items
       .map(
         (it) => `
-        <div class="rarity-${it.rarity} border px-2 py-1.5 relative flex items-center gap-2 min-w-0 ${rolling ? 'upgrade-item-roll' : ''}">
+        <div class="rarity-${it.rarity} border px-2 py-1.5 relative flex items-center gap-2 min-w-0 upgrade-selected-enter">
           ${componentImage(it, 'component-art component-art-mini shrink-0')}
           <div class="min-w-0 flex-1">
             <div class="text-[11px] font-bold text-white truncate">${it.name}</div>
@@ -135,12 +179,13 @@ export function renderSlots(items, rolling = false) {
   if (ui.target) {
     const t = ui.target;
     display.innerHTML = `
-      <div class="w-16 h-16 sm:w-20 sm:h-20 lg:w-28 lg:h-28 rarity-${t.rarity} border flex items-center justify-center overflow-hidden">${componentImage(t, 'component-art component-art-target')}</div>
+      <div class="w-16 h-16 sm:w-20 sm:h-20 lg:w-28 lg:h-28 rarity-${t.rarity} border flex items-center justify-center overflow-hidden upgrade-target-enter">${componentImage(t, 'component-art component-art-target')}</div>
       <span class="text-xs sm:text-sm font-bold text-white leading-tight px-1">${t.name}</span>
       <span class="mono text-sm text-amber-400 font-bold">${fmt(t.price)} 🪙</span>`;
   } else {
-    display.innerHTML = `<i data-lucide="chevrons-up" class="w-10 h-10 text-amber-400/50"></i><span class="text-xs font-semibold text-slate-300">Выберите предмет для апгрейда</span>`;
+    display.innerHTML = emptyPreview(randomComponent(), 'target');
   }
+  syncEmptyPreviewRoll();
   icons();
 }
 

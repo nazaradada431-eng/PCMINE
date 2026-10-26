@@ -115,10 +115,18 @@
         .component-art-mini { width:34px; height:28px; }
         .component-art-target { width:90%; height:90%; }
         .component-art-slot { width:64px; height:48px; }
-        .upgrade-item-roll { animation:item-roll-swap .23s ease-out both; }
-        @keyframes item-roll-swap { from { opacity:.35; transform:translateY(7px) scale(.97); filter:blur(2px); } to { opacity:1; transform:translateY(0) scale(1); filter:blur(0); } }
-        .upgrade-target-roll { width:100px; height:100px; display:flex; align-items:center; justify-content:center; border:1px solid color-mix(in srgb,var(--rarity-glow),transparent 25%); border-radius:16px; background:color-mix(in srgb,var(--rarity-glow),transparent 91%); box-shadow:0 0 14px color-mix(in srgb,var(--rarity-glow),transparent 55%), inset 0 0 18px color-mix(in srgb,var(--rarity-glow),transparent 88%); animation:rarity-roll-pulse .46s ease-in-out infinite alternate; }
-        @keyframes rarity-roll-pulse { from { transform:scale(.94); filter:brightness(.9); } to { transform:scale(1.04); filter:brightness(1.35); } }
+        .empty-upgrade-state { width:100%; height:100%; min-height:0; display:flex; align-items:center; justify-content:center; padding:8px; }
+        .upgrade-empty-preview { width:min(100%,240px); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:8px; transition:opacity .22s ease, transform .22s ease, filter .22s ease; }
+        .upgrade-empty-preview.is-changing { opacity:.25; transform:translateY(7px) scale(.96); filter:blur(2px); }
+        .empty-preview-art { width:100%; height:145px; display:flex; align-items:center; justify-content:center; border-radius:18px; background:radial-gradient(ellipse, color-mix(in srgb,var(--preview-glow),transparent 87%),transparent 72%); }
+        .empty-preview-image { width:88%; height:100%; filter:drop-shadow(0 0 16px color-mix(in srgb,var(--preview-glow),transparent 38%)); animation:component-float 2.8s ease-in-out infinite; }
+        .empty-preview-name { color:#e5e7eb; font-size:12px; font-weight:700; transition:opacity .18s ease; }
+        .empty-preview-hint { color:#8b8f9c; font-size:11px; line-height:1.4; }
+        .upgrade-selected-enter, .upgrade-target-enter { animation:upgrade-item-enter .42s cubic-bezier(.2,.8,.2,1) both; }
+        @keyframes upgrade-item-enter { from { opacity:0; transform:translateY(12px) scale(.96); filter:blur(3px); } to { opacity:1; transform:translateY(0) scale(1); filter:blur(0); } }
+        @keyframes component-float { 0%,100% { transform:translateY(0) scale(1); } 50% { transform:translateY(-5px) scale(1.02); } }
+        @media (max-width:640px) { .empty-preview-art { height:78px; } .upgrade-empty-preview { gap:4px; } }
+        @media (prefers-reduced-motion:reduce) { .empty-preview-image,.upgrade-selected-enter,.upgrade-target-enter { animation:none; } .upgrade-empty-preview { transition:none; } }
 
 .qbtn .gloss { display:none; }
 .qbtn .s0, .qbtn .s1, .qbtn .s2 { stop-color:#16171d; stop-opacity:1; }
