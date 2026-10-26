@@ -49,6 +49,18 @@ function renderAll() {
 
 hooks.refresh = renderAll;
 
+function syncResponsiveUpgradeTools() {
+  const compact = window.matchMedia('(max-width: 639px)').matches;
+  const coinCard = $('coin-deposit-card');
+  const quickTools = $('quick-tools');
+  if (compact) {
+    $('upgrade-tools-mobile').append(coinCard, quickTools);
+  } else {
+    $('panel-inv').prepend(coinCard);
+    $('quick-controls-desktop').append(quickTools);
+  }
+}
+
 const actions = {
   tab: (d) => {
     showView(d.tab);
@@ -93,6 +105,8 @@ document.addEventListener('click', (e) => {
 function init() {
   loadGame();
   ui.target = findItem('gpu_gtx1050');
+  syncResponsiveUpgradeTools();
+  window.matchMedia('(max-width: 639px)').addEventListener('change', syncResponsiveUpgradeTools);
   setupCanvas();
   initDrag();
   initQuick();

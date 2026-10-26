@@ -42,18 +42,14 @@
         .btn-main { background:linear-gradient(180deg,#ffe033,#ffc700); color:#111; border-radius:12px; font-weight:800; }
         .btn-main:hover { filter:brightness(1.07); }
         .btn-main:active { transform:scale(.98); }
-        .up-grid { display:grid; gap:12px; grid-template-columns:minmax(0,1fr);
-            grid-template-areas:"info" "wheel" "btn" "input" "target"; }
-        .a-info{grid-area:info} .a-wheel{grid-area:wheel} .a-input{grid-area:input} .a-target{grid-area:target} .a-btn{grid-area:btn}
+        .up-grid { display:grid; gap:12px; grid-template-columns:1fr 1fr;
+            grid-template-areas:"info info" "wheel wheel" "input target" "quick quick" "btn btn"; }
+        .a-info{grid-area:info} .a-wheel{grid-area:wheel} .a-input{grid-area:input} .a-target{grid-area:target} .a-quick{grid-area:quick} .a-btn{grid-area:btn}
         .a-btn .gbtn { width:100%; max-width:420px; }
         @media (min-width:1024px){
             .up-grid { grid-template-columns:minmax(0,1fr) 340px minmax(0,1fr); gap:14px 22px; align-items:center;
-                grid-template-areas:"input info target" "input wheel target" "input btn target"; }
+                grid-template-areas:"input info target" "input wheel target" "input quick target" "input btn target"; }
             .a-input, .a-target { align-self:stretch; }
-        }
-        @media (min-width:640px) and (max-width:1023px) {
-            .up-grid { grid-template-columns:minmax(0,1fr) minmax(0,1fr); grid-template-areas:"info info" "input target" "wheel wheel" "btn btn"; }
-            #input-zone, #target-zone { height:220px; }
         }
         @media (max-width:520px){ #wheel-box { zoom:.9; } }
                                 .ptab { flex:1; padding:14px 8px; font-weight:700; font-size:15px; color:#8b8f9c; background:#070709; transition:color .15s; }
@@ -115,11 +111,12 @@
 .gbtn.g-off { --c:#8b6b19; --glow:rgba(255,210,31,.12); color:#c7a63d; }
 
 .upgrade-tools { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.4fr); gap:12px; padding:12px 16px; border-bottom:1px solid var(--line); align-items:center; }
-.coin-deposit-card, .quick-tools { min-width:0; background:#13141a; border-radius:14px; padding:10px 12px; }
-.quick-tools .gstrip { height:44px; }
-.quick-tools .gpiece { height:44px; font-size:15px; }
-.quick-tools .gstrip.mt-3 { margin-top:6px; }
-.quick-tools #quick-msg { margin-top:5px; }
+#upgrade-tools-mobile { display:none; }
+#upgrade-tools-mobile > .coin-deposit-card, #upgrade-tools-mobile > .quick-tools { min-width:0; background:#13141a; border-radius:14px; padding:10px 12px; }
+#upgrade-tools-mobile .quick-tools .gstrip { height:44px; }
+#upgrade-tools-mobile .quick-tools .gpiece { height:44px; font-size:15px; }
+#upgrade-tools-mobile .quick-tools .gstrip.mt-3 { margin-top:6px; }
+#upgrade-tools-mobile .quick-tools #quick-msg { margin-top:5px; }
 
 .rig-card { aspect-ratio:1 / 1; }
 .rig-card-title { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; overflow-wrap:anywhere; }
@@ -152,8 +149,10 @@
 .qbtn > span { text-shadow:none; }
 
 @media (max-width:639px) {
-  .up-grid { gap:10px; }
+  .up-grid { gap:10px; grid-template-columns:minmax(0,1fr); grid-template-areas:"info" "wheel" "btn" "input" "target"; }
   .upgrade-hud { padding:10px; }
+  #quick-controls-desktop { display:none; }
+  #upgrade-tools-mobile { display:grid; }
   #input-zone, #target-zone { width:100%; height:190px; padding:10px; }
   .a-wheel { min-height:0; }
   #wheel-box { zoom:.74; }
@@ -161,15 +160,15 @@
   .a-btn .gbtn { max-width:none; height:60px; font-size:18px; }
   .gbtn.g-off { --c:#a27b12; --glow:rgba(255,210,31,.18); color:#d6ad37; }
   .upgrade-tools { grid-template-columns:minmax(0,1fr); gap:8px; padding:10px; }
-  .coin-deposit-card, .quick-tools { padding:9px 10px; border-radius:12px; }
+  #upgrade-tools-mobile > .coin-deposit-card, #upgrade-tools-mobile > .quick-tools { padding:9px 10px; border-radius:12px; }
   .coin-deposit-card label { font-size:12px; line-height:1.25; }
   .coin-deposit-card #add-coins-val { font-size:12px; }
   .coin-deposit-card input[type=range] { height:4px; }
   .coin-deposit-card input[type=range]::-webkit-slider-thumb { width:16px; height:16px; }
   .coin-deposit-card input[type=range]::-moz-range-thumb { width:16px; height:16px; }
-  .quick-tools .gstrip { height:40px; --gap:4px; --slant:10px; }
-  .quick-tools .gstrip.mt-3 { margin-top:5px; }
-  .quick-tools .gpiece { height:40px; font-size:14px; --slant:10px; }
+  #upgrade-tools-mobile .quick-tools .gstrip { height:40px; --gap:4px; --slant:10px; }
+  #upgrade-tools-mobile .quick-tools .gstrip.mt-3 { margin-top:5px; }
+  #upgrade-tools-mobile .quick-tools .gpiece { height:40px; font-size:14px; --slant:10px; }
   #quick-msg { margin-top:4px; min-height:13px; font-size:10px; }
   #items-section .ptab { padding:10px 5px; font-size:12px; line-height:1.25; }
   #panel-target > .flex:first-child { flex-direction:column; align-items:stretch; }

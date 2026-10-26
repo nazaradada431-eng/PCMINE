@@ -91,6 +91,14 @@
                             <div id="target-item-display" class="flex-1 flex flex-col items-center justify-center text-center gap-1.5 min-h-0"></div>
                         </div>
 
+                        <div id="quick-controls-desktop" class="a-quick w-full max-w-[340px] mx-auto">
+                            <div id="quick-tools" class="quick-tools">
+                                <div id="quick-mult" class="gstrip"></div>
+                                <div id="quick-pct" class="gstrip mt-3"></div>
+                                <div id="quick-msg" class="text-xs text-center text-slate-500 mt-2 min-h-[16px]"></div>
+                            </div>
+                        </div>
+
                         <div class="a-btn flex justify-center">
                             <button id="btn-upgrade-action" data-action="upgrade" data-shape="single" disabled class="gpiece gbtn g-off"><span><i data-lucide="chevrons-up" class="w-6 h-6"></i>Улучшить</span></button>
                         </div>
@@ -103,22 +111,16 @@
                         <button id="ptab-target" class="ptab" data-action="panel" data-panel="target" style="border-radius:0">Желаемые предметы</button>
                     </div>
 
-                    <div id="upgrade-tools" class="upgrade-tools">
-                        <div class="coin-deposit-card">
-                            <div class="flex justify-between items-center gap-2 mb-2">
-                                <label for="add-coins-range" class="text-sm text-slate-300">Добавить монет</label>
-                                <span id="add-coins-val" class="text-sm font-bold text-amber-400 mono shrink-0">+0 🪙</span>
+                    <div id="upgrade-tools-mobile" class="upgrade-tools"></div>
+
+                    <div id="panel-inv" class="p-3 sm:p-4 flex flex-col gap-3">
+                        <div id="coin-deposit-card" class="coin-deposit-card bg-[#13141a] rounded-xl p-3">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-slate-300">Добавить монет в апгрейд</span>
+                                <span id="add-coins-val" class="text-sm font-bold text-amber-400 mono">+0 🪙</span>
                             </div>
                             <input type="range" id="add-coins-range" min="0" max="100" value="0" step="1" class="w-full cursor-pointer">
                         </div>
-                        <div class="quick-tools">
-                            <div id="quick-mult" class="gstrip"></div>
-                            <div id="quick-pct" class="gstrip mt-3"></div>
-                            <div id="quick-msg" class="text-xs text-center text-slate-500 mt-2 min-h-[16px]"></div>
-                        </div>
-                    </div>
-
-                    <div id="panel-inv" class="p-3 sm:p-4 flex flex-col gap-3">
                         <div class="flex justify-between items-center gap-3">
                             <span class="text-xs text-slate-500 flex items-center gap-1.5"><i data-lucide="hand" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i> Зажмите деталь и перетащите в «Ваши предметы» или нажмите на неё</span>
                             <button data-action="sell-common" class="text-xs text-slate-400 hover:text-amber-400 transition shrink-0">Продать все Common</button>
