@@ -19,7 +19,7 @@ import { playSound } from '../core/audio.js';
 const MAX_CHANCE = 95;
 const QUICK_MULTIPLIERS = [
   { value: 2, color: 'green' },
-  { value: 3, color: 'yellow' },
+  { value: 4, color: 'yellow' },
   { value: 8, color: 'red' }
 ];
 const QUICK_PERCENTS = [
