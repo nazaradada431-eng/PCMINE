@@ -43,7 +43,7 @@
         .btn-main:hover { filter:brightness(1.07); }
         .btn-main:active { transform:scale(.98); }
         .up-grid { display:grid; gap:12px; grid-template-columns:minmax(0,1fr);
-            grid-template-areas:"info" "input" "target" "wheel" "btn"; }
+            grid-template-areas:"info" "wheel" "btn" "input" "target"; }
         .a-info{grid-area:info} .a-wheel{grid-area:wheel} .a-input{grid-area:input} .a-target{grid-area:target} .a-btn{grid-area:btn}
         .a-btn .gbtn { width:100%; max-width:420px; }
         @media (min-width:1024px){
