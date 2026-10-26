@@ -51,6 +51,11 @@
                 grid-template-areas:"input info target" "input wheel target" "input quick target" "input btn target"; }
             .a-input, .a-target { align-self:stretch; }
         }
+        @media (min-width:640px) and (max-width:1023px) {
+            .up-grid { grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+                grid-template-areas:"info info" "wheel wheel" "quick quick" "btn btn" "input target"; }
+            #input-zone, #target-zone { height:220px; }
+        }
         @media (max-width:520px){ #wheel-box { zoom:.9; } }
                                 .ptab { flex:1; padding:14px 8px; font-weight:700; font-size:15px; color:#8b8f9c; background:#070709; transition:color .15s; }
         .ptab.on { color:#fff; background:var(--panel); }
